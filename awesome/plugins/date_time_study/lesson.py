@@ -15,7 +15,7 @@ async def high_math():
         pass
 async def english():
     bot = nonebot.get_bot()
-    now = datetime.today().hour+datetime.today().minute
+    now = str(datetime.today().hour)+':'+str(datetime.today().minute)
     try:
         await bot.send_group_msg(group_id=GROUP_ID, message=f'现在已经{now}点啦，请大家准备上英语并前往英语学习群查看老师下布置得任务！')
     except CQHttpError:
