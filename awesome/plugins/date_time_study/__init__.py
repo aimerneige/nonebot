@@ -10,14 +10,12 @@ from .mon import *
 
 @nonebot.scheduler.scheduled_job(
     'interval',
-    minutes=1,
+    minutes=10,
 )
 async def _():
     d = datetime.today().weekday()
-    #switch = {0: mon, 1: tue, 2: web, 3: thu, 4: fri,5:sat,6:sat}
-
     try:
-        if 0 <= d <=6:
+        if 0 <= d <=5:
             print(d)
             try:
                 await mon(d)
