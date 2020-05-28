@@ -82,7 +82,7 @@ class wife:
         self.liking = random.randint(0, 30)
         self.isMerry = False
         self.isTalk = False
-
+        self.scence=get_love_scence()
     def get_merry(self):
         if self.liking >= 50 and self.isMerry == False:
             self.isMerry = True
@@ -107,13 +107,8 @@ class wife:
                 + "\n当前好感度:" + str(self.liking)
         return index
 
-    def get_love_scence(self):
-        url = 'https://api.uomg.com/api/rand.qinghua?format=json'
-        date = requests.get(url).json().get('content')
-        return date
-
 
 def get_love_scence():
-    url = 'https://api.uomg.com/api/rand.qinghua?format=json'
+    url = 'https://api.uomg.com/api/rand.qinghua'
     date = requests.get(url).json().get('content')
     return date
