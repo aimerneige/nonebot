@@ -50,14 +50,25 @@ class user_list:
 
 class wife:
     def __init__(self, user):
+        f = random.randint(0, len(work) - 1)
+        g = random.randint(0, len(race) - 1)
         a = random.randint(0, len(surname) - 1)
         b = random.randint(0, len(name) - 1)
+        self.work = work[f]
+        self.race = race[g]
+
         c = random.randint(0, len(ouPai_size) - 1)
         d = random.randint(16, 24)
         e = random.randint(0, len(sex) - 1)
-        f = random.randint(0, len(work) - 1)
-        g = random.randint(0, len(race) - 1)
+
+        if self.work == '小学生':
+            d -= 8
         h = random.randint(145, 170)
+
+        if d >= 16 and h < 150 and not self.race=='矮人' :
+            h += 10
+        if self.race == '矮人':
+            h -= 30
         i = random.randint(85, 110)
         j = random.randint(0, len(mengDian) - 1)
         self.name = surname[a] + name[b]
@@ -67,11 +78,10 @@ class wife:
         self.height = str(h)
         self.widget = str(i)
         self.sex = sex[e]
-        self.work = work[f]
-        self.race = race[g]
         self.meng = mengDian[j]
         self.liking = random.randint(0, 30)
         self.isMerry = False
+        self.isTalk = False
 
     def get_merry(self):
         if self.liking >= 50 and self.isMerry == False:
@@ -101,7 +111,9 @@ class wife:
         url = 'https://api.uomg.com/api/rand.qinghua?format=json'
         date = requests.get(url).json().get('content')
         return date
+
+
 def get_love_scence():
-        url = 'https://api.uomg.com/api/rand.qinghua?format=json'
-        date = requests.get(url).json().get('content')
-        return date
+    url = 'https://api.uomg.com/api/rand.qinghua?format=json'
+    date = requests.get(url).json().get('content')
+    return date

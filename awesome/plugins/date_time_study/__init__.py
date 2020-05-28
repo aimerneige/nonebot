@@ -2,6 +2,7 @@ from datetime import datetime
 from apscheduler.triggers.cron import CronTrigger
 import nonebot
 import pytz
+from requests import *
 from nonebot import on_command, scheduler
 from aiocqhttp.exceptions import Error as CQHttpError
 from nonebot import on_natural_language, NLPSession, IntentCommand, NLPResult, session, on_request
@@ -79,6 +80,32 @@ async def Query(session: CommandSession):
                     break
     except:
         await session.send("今日六班无课")
+
+
+@on_command('getNews', aliases=('新闻'), only_to_me=False)
+async def news(session: CommandSession):
+    src = get_news()
+    await  session.send(src)
+
+
+def get_news():
+    src = '午间新闻：\n'
+    url = 'https://v1.alapi.cn/api/new/toutiao'
+    data = get(url).json()['data']
+    for i in data:
+        src += '\n' + i['title'] + '\n'  + i['m_url'] + '\n' + i['time'] + '\n--------------------'
+    return src
+
+
+@nonebot.scheduler.scheduled_job(
+    'cron',
+    day='*',
+    hour='12'
+)
+async def afternoon_news():
+    src = get_news()
+    bot = nonebot.get_bot()
+    await bot.send_group_msg(group_id=586078667, message=src)
 
 
 @nonebot.scheduler.scheduled_job(
