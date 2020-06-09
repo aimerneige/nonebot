@@ -16,7 +16,7 @@ async def hunsband_goodMorning():
     for i in wife_lists.all_user:
         try:
             await bot.send_private_msg(user_id=i.id, message='老公早安!')
-            await bot.send_private_msg(user_id=i.id, message=get_love_scence())
+            await bot.send_private_msg(user_id=i.id, message=await get_love_scence())
         except:
             pass
 
@@ -27,16 +27,20 @@ async def hunsband_goodMorning():
 )
 async def ToDayisTalk():
     bot = nonebot.get_bot()
-    for i in wife_lists.user_wife_list:
-        if i.isTalk is True:
-            i.isTalk = False
-        else:
-            i.liking -= 2
-            await bot.send_private_msg(user_id=i.husband, message='你今天一天没理我，扣除2点好感度')
-    write(wife_lists)
+    try:
+        for i in wife_lists.user_wife_list:
+            if i.isTalk is True:
+                i.isTalk = False
+            else:
+                i.liking -= 2
+                await bot.send_private_msg(user_id=i.husband, message='你今天一天没理我，扣除2点好感度')
+    except:
+        await bot.send_private_msg(user_id=1149558764, message="扣除好感度出错！")
+        return
+    await  write(wife_lists)
 
 
-def read():
+async def read():
     try:
         with open('index.json', 'r+', encoding='utf-8') as f:
             line = f.readline()
@@ -46,16 +50,16 @@ def read():
                 user_id = t['husband']
                 temp_wife = wife(user_id)
                 temp_wife.height = t['height']
-                temp_wife.widget = t['widget']
+                temp_wife.weight = t['weight']
                 temp_wife.name = t['name']
-                temp_wife.ouPai = t['ouPai']
+                temp_wife.ouBai = t['ouBai']
                 temp_wife.liking = t['liking']
-                temp_wife.sex = t['sex']
+                temp_wife.Character = t['character']
                 temp_wife.age = t['age']
                 temp_wife.isMerry = t['isMerry']
                 temp_wife.work = t['work']
                 temp_wife.race = t['race']
-                temp_wife.meng = t['meng']
+                temp_wife.bud = t['bud']
                 temp_wife.husband = t['husband']
                 wife_lists.add_user(temp_wife)
                 wife_lists.all_user.append(user(user_id))
@@ -86,9 +90,8 @@ async def wife_self_index(session: NLPSession):
 # 如果不传入 keywords，则响应所有没有被当作命令处理的消息
 async def _(session: NLPSession):
     if not wife_lists.alredyInit:
-        read()
+        await read()
         wife_lists.alredyInit = True
-    bot = nonebot.get_bot()
     send_user = session.event['user_id']
     if send_user in wife_lists.user:
         for i in wife_lists.user_wife_list:
@@ -96,7 +99,6 @@ async def _(session: NLPSession):
                 if i.isTalk is False:
                     i.isTalk = True
                 await session.send(message=f'我是{i.name},老公你找我啊', at_sender=True)
-        return
     else:
         flag = False
         for i in wife_lists.all_user:
@@ -111,7 +113,9 @@ async def _(session: NLPSession):
         tempWife = wife(send_user)
         wife_lists.add_user(tempWife)
         await session.send(message=f"你好！我是{tempWife.name},从今天开始就成为你的妻子了，请多关照", at_sender=True)
-    write(wife_lists)
+    beifeng(wife_lists)
+    await write(wife_lists)
+    return
 
 
 @on_natural_language(only_to_me=False)
@@ -119,6 +123,7 @@ async def call_one_wife(session: NLPSession):
     msg = session.msg_text
     send_user = session.event['user_id']
     for i in wife_lists.user_wife_list:
+
         if i.name == msg and send_user == i.husband:
             return IntentCommand(90, 'wife_love')
         elif i.name == msg:
@@ -129,7 +134,6 @@ async def call_one_wife(session: NLPSession):
 
 @on_command('wife_index', aliases="老婆的个人信息", only_to_me=False)
 async def wife_self_index(session: NLPSession):
-    bot = nonebot.get_bot()
     send_user = session.event['user_id']
     if send_user in wife_lists.user:
         for i in wife_lists.user_wife_list:
@@ -178,7 +182,7 @@ async def love(session: NLPSession):
                 elif i.sex == 'M':
                     await session.send(message=i.name + ":" + "啊……就是这样，请更多地鞭策我，你越是鞭策，我就越是喜欢你~尽管你这么说了，但我是绝对不会放弃你的",
                                        at_sender=True)
-                elif i.sex == 'M':
+                elif i.sex == 'S':
                     await session.send(message=i.name + ":" + "切~看来你需要被我用高跟鞋踩在头上好好地调教一番呢",
                                        at_sender=True)
                 elif i.sex == '弱气':
@@ -197,7 +201,8 @@ async def love(session: NLPSession):
                     await session.send(message=i.name + ":" + "祝你幸福", at_sender=True)
                 wife_lists.user_wife_list.remove(i)
                 wife_lists.user.remove(send_user)
-                write(wife_lists)
+                beifeng(wife_lists)
+                await  write(wife_lists)
                 return
     else:
         await session.send(message="你没有老婆,谈什么分手", at_sender=True)
@@ -230,14 +235,15 @@ async def love(session: NLPSession):
 
 @on_command('wife_love', aliases="老婆！", only_to_me=False)
 async def love(session: NLPSession):
-    bot = nonebot.get_bot()
     send_user = session.event['user_id']
     if send_user in wife_lists.user:
         for i in wife_lists.user_wife_list:
             if i.husband == send_user:
                 i.isTalk = True
                 i.liking += 2
-                await session.send(message=i.name + ":" + i.scence, at_sender=True)
-                i.scence=get_love_scence()
+                if i.scence == None:
+                    i.scence = await  get_love_scence()
+                await session.send(message=str(i.name) + ":" + str(i.scence), at_sender=True)
+                i.scence = await  get_love_scence()
     else:
         await session.send(message="你没有老婆", at_sender=True)

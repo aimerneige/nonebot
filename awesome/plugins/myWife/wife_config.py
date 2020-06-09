@@ -5,29 +5,56 @@ import json
 import os
 
 
-def write(user_list):
-    with open('index.json', 'w+', encoding='utf-8') as f:
-        src = '['
-        for wife in user_list.user_wife_list:
-            date = {'name': wife.name,
-                    'age': wife.age,
-                    'husband': wife.husband,
-                    'ouPai': wife.ouPai,
-                    'height': wife.height,
-                    'widget': wife.widget,
-                    'sex': wife.sex,
-                    'meng': wife.meng,
-                    'isMerry': wife.isMerry,
-                    'liking': wife.liking,
-                    'work': wife.work,
-                    'race': wife.race}
-            if len(user_list.user_wife_list) - 1 == user_list.user_wife_list.index(wife):
-                src = src + (json.dumps(date, ensure_ascii=False))
-            else:
-                src = src + (json.dumps(date, ensure_ascii=False) + ',\n')
-        src = src + (']')
-        f.write(src)
-        f.close()
+def beifeng(wife_list):
+    if len(wife_list.user_wife_list) > 0:
+        with open('./beifeng/index.json', 'w+', encoding='utf-8') as f:
+            src = '['
+            for wife in wife_list.user_wife_list:
+                date = {'name': wife.name,
+                        'age': wife.age,
+                        'husband': wife.husband,
+                        'ouBai': wife.ouBai,
+                        'height': wife.height,
+                        'weight': wife.weight,
+                        'character': wife.Character,
+                        'bud': wife.bud,
+                        'isMerry': wife.isMerry,
+                        'liking': wife.liking,
+                        'work': wife.work,
+                        'race': wife.race}
+                if len(wife_list.user_wife_list) - 1 == wife_list.user_wife_list.index(wife):
+                    src = src + (json.dumps(date, ensure_ascii=False))
+                else:
+                    src = src + (json.dumps(date, ensure_ascii=False) + ',\n')
+            src = src + (']')
+            f.write(src)
+            f.close()
+
+
+async def write(wife_list):
+    if len(wife_list.user_wife_list) > 0:
+        with open('index.json', 'w+', encoding='utf-8') as f:
+            src = '['
+            for wife in wife_list.user_wife_list:
+                date = {'name': wife.name,
+                        'age': wife.age,
+                        'husband': wife.husband,
+                        'ouBai': wife.ouBai,
+                        'height': wife.height,
+                        'weight': wife.weight,
+                        'character': wife.Character,
+                        'bud': wife.bud,
+                        'isMerry': wife.isMerry,
+                        'liking': wife.liking,
+                        'work': wife.work,
+                        'race': wife.race}
+                if len(wife_list.user_wife_list) - 1 == wife_list.user_wife_list.index(wife):
+                    src = src + (json.dumps(date, ensure_ascii=False))
+                else:
+                    src = src + (json.dumps(date, ensure_ascii=False) + ',\n')
+            src = src + (']')
+            f.write(src)
+            f.close()
 
 
 class user:
@@ -46,43 +73,54 @@ class user_list:
     def add_user(self, wife):
         self.user_wife_list.append(wife)
         self.user.append(wife.husband)
+        self.all_user.append(user(wife.husband))
 
 
 class wife:
     def __init__(self, user):
-        f = random.randint(0, len(work) - 1)
-        g = random.randint(0, len(race) - 1)
-        a = random.randint(0, len(surname) - 1)
-        b = random.randint(0, len(name) - 1)
-        self.work = work[f]
-        self.race = race[g]
-
-        c = random.randint(0, len(ouPai_size) - 1)
-        d = random.randint(16, 24)
-        e = random.randint(0, len(sex) - 1)
-
-        if self.work == '小学生':
-            d -= 8
-        h = random.randint(145, 170)
-
-        if d >= 16 and h < 150 and not self.race=='矮人' :
-            h += 10
-        if self.race == '矮人':
-            h -= 30
-        i = random.randint(85, 110)
-        j = random.randint(0, len(mengDian) - 1)
-        self.name = surname[a] + name[b]
-        self.ouPai = ouPai_size[c]
         self.husband = user
-        self.age = d
-        self.height = str(h)
-        self.widget = str(i)
-        self.sex = sex[e]
-        self.meng = mengDian[j]
+
+        WorkRandom = random.randint(0, len(work) - 1)
+        self.work = work[WorkRandom]
+
+        RaceRandom = random.randint(0, len(race) - 1)
+        self.race = race[RaceRandom]
+
+        SurnameRandom = random.randint(0, len(surname) - 1)
+        nameRandom = random.randint(0, len(name) - 1)
+        self.name = surname[SurnameRandom] + name[nameRandom]
+
+        OuBaiRandom = random.randint(0, len(ouBaiSize) - 1)
+        self.ouBai = ouBaiSize[OuBaiRandom]
+
+        CharacterRandom = random.randint(0, len(Character) - 1)
+        self.Character = Character[CharacterRandom]
+
+        age = random.randint(16, 24)
+        if self.work == '小学生':
+            age -= 8
+        self.age = age
+
+        high = random.randint(145, 170)
+        if age >= 16 and high < 150 and not self.race == '矮人':
+            high += 10
+        if self.race == '矮人':
+            high -= 30
+        self.height = str(high)
+
+        weight = random.randint(85, 110)
+        self.weight = str(weight)
+
+        bud = random.randint(0, len(mengDian) - 1)
+        self.bud = mengDian[bud]
+
         self.liking = random.randint(0, 30)
+
         self.isMerry = False
         self.isTalk = False
-        self.scence=get_love_scence()
+
+        self.scence = None
+
     def get_merry(self):
         if self.liking >= 50 and self.isMerry == False:
             self.isMerry = True
@@ -98,17 +136,17 @@ class wife:
                 + ":\n年龄:" \
                 + str(self.age) \
                 + "\n身高：" + self.height \
-                + "\n体重:" + self.widget \
+                + "\n体重:" + self.weight \
                 + "\n欧派:" \
-                + self.ouPai \
+                + self.ouBai \
                 + "\n种族:" \
                 + self.race \
-                + "\n职业:" + self.work + '\n性格：' + self.sex + '\n萌点：' + self.meng \
+                + "\n职业:" + self.work + '\n性格：' + self.Character + '\n萌点：' + self.bud \
                 + "\n当前好感度:" + str(self.liking)
         return index
 
 
-def get_love_scence():
+async def get_love_scence():
     url = 'https://api.uomg.com/api/rand.qinghua'
     date = requests.get(url).json().get('content')
     return date
